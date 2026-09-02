@@ -55,9 +55,9 @@ export async function preprocessImage(objectUrl: string): Promise<string> {
   const histogram = new Array<number>(256).fill(0);
   const gray = new Uint8ClampedArray(width * height);
   for (let i = 0, p = 0; i < data.length; i += 4, p++) {
-    const g = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+    const g = Math.round(0.299 * data[i]! + 0.587 * data[i + 1]! + 0.114 * data[i + 2]!);
     gray[p] = g;
-    histogram[g]++;
+    histogram[g] = (histogram[g] ?? 0) + 1;
   }
 
   // Pass 2: contrast stretch between the 2nd and 98th percentile
@@ -68,7 +68,7 @@ export async function preprocessImage(objectUrl: string): Promise<string> {
   let low = 0;
   let high = 255;
   for (let v = 0; v < 256; v++) {
-    acc += histogram[v];
+    acc += histogram[v]!;
     if (acc >= lowCut) {
       low = v;
       break;
@@ -76,7 +76,7 @@ export async function preprocessImage(objectUrl: string): Promise<string> {
   }
   acc = 0;
   for (let v = 0; v < 256; v++) {
-    acc += histogram[v];
+    acc += histogram[v]!;
     if (acc >= highCut) {
       high = v;
       break;
@@ -89,13 +89,13 @@ export async function preprocessImage(objectUrl: string): Promise<string> {
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const p = y * width + x;
-      const stretched = Math.max(0, Math.min(255, ((gray[p] - low) / span) * 255));
+      const stretched = Math.max(0, Math.min(255, ((gray[p]! - low) / span) * 255));
 
       // Local mean over a coarse grid cell (cheap approximation of adaptive
       // thresholding, good enough to kill uneven package lighting).
       const cx = Math.min(width - 1, Math.floor(x / box) * box + box / 2);
       const cy = Math.min(height - 1, Math.floor(y / box) * box + box / 2);
-      const localRef = gray[Math.round(cy) * width + Math.round(cx)];
+      const localRef = gray[Math.round(cy) * width + Math.round(cx)] ?? 0;
       const localStretched = Math.max(0, Math.min(255, ((localRef - low) / span) * 255));
 
       const bias = stretched - localStretched;
@@ -124,13 +124,13 @@ function collectWords(payload: unknown): WordLike[] {
       return;
     }
     const obj = node as Record<string, unknown>;
-    if (Array.isArray(obj.words)) {
-      for (const w of obj.words as WordLike[]) {
+    if (Array.isArray(obj['words'])) {
+      for (const w of obj['words'] as WordLike[]) {
         if (w && typeof w.text === "string") out.push(w);
       }
     }
     for (const key of ["blocks", "paragraphs", "lines", "symbols"]) {
-      if (Array.isArray(obj[key])) visit(obj[key], depth + 1);
+      if (Array.isArray(obj[key!])) visit(obj[key!], depth + 1);
     }
   };
   visit(payload, 0);
