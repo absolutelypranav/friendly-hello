@@ -144,7 +144,21 @@ export async function runOcr(
   imageSource: string,
   onProgress?: (p: OcrProgress) => void,
 ): Promise<OcrResult> {
-  const { createWorker } = await import("tesseract.js");
+  // tesseract.js ships a CJS default export; interop can put the API on
+  // either the namespace or `default` depending on the bundler pass.
+  const mod = (await import("tesseract.js")) as unknown as Record<string, unknown> & {
+    default?: Record<string, unknown>;
+  };
+  const api = (typeof mod['createWorker'] === "function" ? mod : mod.default) as {
+    createWorker: (lang: string, oem: number, options: unknown) => Promise<{
+      recognize: (image: string, opts: unknown, output: unknown) => Promise<{ data: unknown }>;
+      terminate: () => Promise<unknown>;
+    }>;
+  };
+  if (!api || typeof api.createWorker !== "function") {
+    throw new Error("The OCR engine could not be loaded. Please reload the page and try again.");
+  }
+  const createWorker = api.createWorker;
 
   const worker = await createWorker("eng", 1, {
     logger: (m: { status?: string; progress?: number }) => {
