@@ -118,7 +118,7 @@ function ScanPage() {
     [scan],
   );
 
-  const useSample = useCallback(
+  const loadSample = useCallback(
     async (src: string, label: string) => {
       try {
         const res = await fetch(src);
@@ -274,7 +274,7 @@ function ScanPage() {
                     size="sm"
                     className="justify-start"
                     disabled={busy}
-                    onClick={() => void useSample(s.src, s.label)}
+                    onClick={() => void loadSample(s.src, s.label)}
                   >
                     <FileImage className="size-4" /> {s.label}
                   </Button>
