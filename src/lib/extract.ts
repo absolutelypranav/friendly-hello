@@ -101,7 +101,7 @@ export function extractManufacturer(text: string) {
 
 export function extractCommodityName(text: string) {
   const lines = text.split("\n");
-  const cue = lines.find((l) => /\b(product\s*name|commodity|generic\s*name|name\s*of\s*(the\s*)?(product|commodity))\b/i.test(l));
+  const cue = lines.find((l) => /\b(common\s*name|product\s*name|commodity|generic\s*name|name\s*of\s*(the\s*)?(product|commodity))\b/i.test(l));
   if (cue) {
     const value = cue.replace(/^.*?(:|-)\s*/, "").trim() || cue.trim();
     return { value, matched: cue.trim() };
@@ -166,18 +166,25 @@ export function extractRetailPrice(text: string) {
 
 function findDated(text: string, cue: RegExp) {
   const flat = text.split("\n");
+  let fallback: { matched: string; date: Date | null } | null = null;
+
   for (let i = 0; i < flat.length; i++) {
     const line = flat[i]!;
     if (!cue.test(line)) continue;
     const window = flat.slice(i, i + 2).join(" ");
-    const segment = window.slice(window.search(cue) >= 0 ? window.search(cue) : 0, 120);
-    return { matched: segment.trim(), date: parseLabelDate(segment) };
+    const at = window.search(cue);
+    const segment = window.slice(at >= 0 ? at : 0, at >= 0 ? at + 120 : 120);
+    const candidate = { matched: segment.trim(), date: parseLabelDate(segment) };
+    // Prefer the first cue whose neighbourhood actually contains a date; a
+    // bare cue word ("Manufactured by") must not win over "MFG 04/2026".
+    if (candidate.date) return candidate;
+    if (!fallback) fallback = candidate;
   }
-  return null;
+  return fallback;
 }
 
 export function extractManufactureDate(text: string) {
-  const hit = findDated(text, /\b(mfg|mfd|manufactur\w*|packed\s*on|pkd|date\s*of\s*(manufacture|packing|import)|month\s*(&|and)?\s*year\s*of\s*(manufacture|packing))\b/i);
+  const hit = findDated(text, /\b(mfg|mfd|pkd|packed\s*on|manufactur\w*\s*(date|on)|date\s*of\s*(manufacture|packing|import)|month\s*(&|and)?\s*year\s*of\s*(manufacture|packing|import))\b/i);
   if (!hit) return null;
   return { value: hit.date ? hit.date.toISOString().slice(0, 10) : hit.matched, matched: hit.matched, date: hit.date };
 }
