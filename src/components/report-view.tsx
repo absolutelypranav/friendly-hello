@@ -77,7 +77,7 @@ export function ReportView({ report, onDownload }: { report: ComplianceReport; o
 
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <p className="text-xs text-muted-foreground">
-          OCR confidence {Math.round(report.ocrConfidence)}% · generated{" "}
+          Extraction confidence {Math.round(report.ocrConfidence)}% · generated{" "}
           {new Date(report.generatedAt).toLocaleString()}
         </p>
         <div className="flex gap-2">

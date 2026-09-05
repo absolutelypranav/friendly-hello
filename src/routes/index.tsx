@@ -10,7 +10,9 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Toaster } from "@/components/ui/sonner";
 import { extractDeclarations } from "@/lib/extract";
+import { prepareImageForVision } from "@/lib/image-vision";
 import { evaluate, type ComplianceReport } from "@/lib/rules";
+import { scanLabelWithVision } from "@/lib/scan-label.functions";
 
 const SAMPLES = [
   { src: "/samples/label-compliant.png", label: "Compliant snack pack" },
@@ -25,13 +27,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Upload a photo of a food or product label and get an instant rule-by-rule compliance report under the Legal Metrology (Packaged Commodities) Rules, 2011. Runs entirely in your browser.",
+          "Upload a package-label photo for precise AI text extraction and a rule-by-rule compliance report under the Legal Metrology (Packaged Commodities) Rules, 2011.",
       },
       { property: "og:title", content: "LegalScan — check packaged label compliance from a photo" },
       {
         property: "og:description",
         content:
-          "Scan a package label, extract every mandatory declaration with OCR, and see which Legal Metrology 2011 requirements pass or fail.",
+          "Scan a package label with AI vision and see which Legal Metrology 2011 requirements pass or fail.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -68,7 +70,7 @@ function ScanPage() {
   }, []);
 
   const scan = useCallback(
-    async (blobUrl: string) => {
+    async (imageFile: Blob) => {
       setPhase("preparing");
       setProgress(0);
       setStage("preparing image");
@@ -76,22 +78,26 @@ function ScanPage() {
       setText("");
 
       try {
-        const { preprocessImage, runOcr } = await import("@/lib/ocr");
-        const prepared = await preprocessImage(blobUrl);
+        const prepared = await prepareImageForVision(imageFile);
 
         setPhase("reading");
-        const result = await runOcr(prepared, (p) => {
-          setStage(p.stage);
-          setProgress(Math.round(p.progress * 100));
-        });
+        setStage("secure AI vision analysis");
+        setProgress(55);
+        const result = await scanLabelWithVision({ data: { imageDataUrl: prepared } });
+        if (!result.ok) throw new Error(result.message);
 
-        setText(result.text.trim());
+        setText(result.transcription.trim());
         setConfidence(result.confidence);
-        analyse(result.text, result.confidence);
+        setStage("evaluating declarations");
+        setProgress(90);
+        analyse(result.transcription, result.confidence);
         setPhase("done");
+        setProgress(100);
 
-        if (!result.text.trim()) {
+        if (!result.transcription.trim()) {
           toast.error("No text could be read from that image. Try a sharper, straight-on photo of the label.");
+        } else if (result.warnings.length > 0) {
+          toast.warning(result.warnings.join(" "));
         }
       } catch (error) {
         console.error(error);
@@ -113,7 +119,7 @@ function ScanPage() {
       urlRef.current = url;
       setImageUrl(url);
       setFileName(file.name);
-      void scan(url);
+      void scan(file);
     },
     [scan],
   );
@@ -129,7 +135,7 @@ function ScanPage() {
         urlRef.current = url;
         setImageUrl(url);
         setFileName(label);
-        void scan(url);
+        void scan(blob);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Could not load that sample.");
       }
@@ -162,9 +168,9 @@ function ScanPage() {
             Check a package label for Legal Metrology compliance
           </h1>
           <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-            Upload or photograph the label of a packaged commodity. Text is read on-device with OCR, every mandatory
-            declaration is extracted, and each requirement of the Legal Metrology (Packaged Commodities) Rules, 2011 is
-            checked. No image or data ever leaves your browser.
+            Upload or photograph the label of a packaged commodity. Secure AI vision reads the English text, extracts
+            every mandatory declaration, and checks the Legal Metrology (Packaged Commodities) Rules, 2011. The image is
+            sent securely for analysis and is not added to scan history.
           </p>
         </div>
 
@@ -197,7 +203,7 @@ function ScanPage() {
                 <div className="py-6">
                   <FileImage className="mx-auto size-10 text-muted-foreground" />
                   <p className="mt-3 text-sm font-medium text-card-foreground">Drop a label photo here</p>
-                  <p className="mt-1 text-xs text-muted-foreground">JPG, PNG or WebP · processed on your device</p>
+                  <p className="mt-1 text-xs text-muted-foreground">JPG, PNG or WebP · internet required</p>
                 </div>
               )}
 
@@ -234,7 +240,7 @@ function ScanPage() {
                 </div>
                 <Progress value={phase === "preparing" ? 8 : Math.max(progress, 5)} className="mt-3" />
                 <p className="mt-2 text-xs text-muted-foreground">
-                  The OCR engine loads once, then stays cached for later scans.
+                  AI vision is checking the full label, including curved and low-contrast text.
                 </p>
               </div>
             ) : null}
@@ -242,7 +248,7 @@ function ScanPage() {
             <div className="rounded-lg border border-border bg-card p-4">
               <h2 className="text-sm font-semibold text-card-foreground">Extracted text</h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                OCR is imperfect. Correct any misread line and re-check — the rules run on this text.
+                Correct any uncertain line and re-check — the compliance rules run on this text.
               </p>
               <Textarea
                 value={text}

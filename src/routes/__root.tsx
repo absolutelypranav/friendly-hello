@@ -81,7 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Scan a packaged commodity label and check it against the Legal Metrology (Packaged Commodities) Rules, 2011." },
       { name: "author", content: "LegalScan" },
       { property: "og:title", content: "LegalScan — Legal Metrology label compliance checker" },
-      { property: "og:description", content: "Check packaged label compliance from a photo, in your browser." },
+       { property: "og:description", content: "Check packaged label compliance from a photo with precise AI vision." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
