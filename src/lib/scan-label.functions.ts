@@ -43,7 +43,7 @@ function errorDetails(error: unknown): { status?: number; message: string } {
         ? record['status']
         : undefined;
     const message = typeof record['message'] === "string" ? record['message'] : "AI label extraction failed.";
-    return { status, message };
+    return status === undefined ? { message } : { status, message };
   }
   return { message: "AI label extraction failed." };
 }
