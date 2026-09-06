@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { FileImage, Loader2, RotateCcw, ScanLine, Upload } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -45,6 +46,7 @@ export const Route = createFileRoute("/")({
 type Phase = "idle" | "preparing" | "reading" | "done";
 
 function ScanPage() {
+  const scanLabel = useServerFn(scanLabelWithVision);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [phase, setPhase] = useState<Phase>("idle");
@@ -83,7 +85,7 @@ function ScanPage() {
         setPhase("reading");
         setStage("secure AI vision analysis");
         setProgress(55);
-        const result = await scanLabelWithVision({ data: { imageDataUrl: prepared } });
+        const result = await scanLabel({ data: { imageDataUrl: prepared } });
         if (!result.ok) throw new Error(result.message);
 
         setText(result.transcription.trim());
@@ -105,7 +107,7 @@ function ScanPage() {
         toast.error(error instanceof Error ? error.message : "The scan failed. Please try another image.");
       }
     },
-    [analyse],
+    [analyse, scanLabel],
   );
 
   const acceptFile = useCallback(
