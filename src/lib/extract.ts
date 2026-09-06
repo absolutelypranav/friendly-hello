@@ -1,5 +1,5 @@
 /**
- * Pure declaration extractors over OCR text.
+ * Pure declaration extractors over transcribed label text.
  *
  * No I/O, no DOM: every function here takes text and returns structured
  * findings, so each declaration can be reasoned about (and tested) alone.
@@ -25,7 +25,7 @@ export type Declarations = {
   importer: boolean;
 };
 
-/** Normalise OCR text: collapse odd whitespace, keep line structure. */
+/** Normalise transcribed text: collapse odd whitespace, keep line structure. */
 export function normalise(raw: string): string {
   return raw
     .replace(/\r/g, "")
