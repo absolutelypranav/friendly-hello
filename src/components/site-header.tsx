@@ -12,7 +12,7 @@ export function SiteHeader() {
           <span className="leading-tight">
             <span className="block text-sm font-semibold tracking-tight">Project Metro Scan</span>
             <span className="block text-[11px] uppercase tracking-widest text-muted-foreground">
-              Packaged Commodities Rules, 2011
+              OUR HACKATHON PROJECT (PROTOTYPE)
             </span>
           </span>
         </Link>
