@@ -49,7 +49,7 @@ function errorDetails(error: unknown): { status?: number; message: string } {
 }
 
 export const scanLabelWithVision = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => ScanInput.parse(input))
+  .validator((input: unknown) => ScanInput.parse(input))
   .handler(async ({ data }) => {
     const apiKey = process.env['LOVABLE_API_KEY'];
     if (!apiKey) {

@@ -267,12 +267,12 @@ export function evaluate(d: Declarations, ocrConfidence: number): ComplianceRepo
     ),
   );
 
-  // Low OCR confidence should never produce a confident PASS.
+  // Low extraction confidence should never produce a confident PASS.
   const finalResults =
     ocrConfidence > 0 && ocrConfidence < 65
       ? results.map((r) =>
           r.status === "pass"
-            ? { ...r, status: "review" as RuleStatus, note: `${r.note} (OCR confidence was low — verify the extracted text.)` }
+            ? { ...r, status: "review" as RuleStatus, note: `${r.note} (Extraction confidence was low — verify the extracted text.)` }
             : r,
         )
       : results;
