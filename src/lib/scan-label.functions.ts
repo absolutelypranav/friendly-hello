@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { Output, streamText } from "ai";
 import { z } from "zod";
 
-import { createLovableAiProvider } from "./ai-gateway.server";
+import { resolveVisionModel } from "./ai-gateway.server";
 
 const ScanInput = z.object({
   imageDataUrl: z
