@@ -30,7 +30,7 @@ function RulesPage() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Rules checked</h1>
+        <h1 className="text-3xl tracking-tight text-foreground sm:text-4xl">Rules checked</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           LegalScan evaluates each declaration below against the text read from the label image. Declarations that
           depend on the physical package (print height, panel area) are reported as manual checks rather than guessed.

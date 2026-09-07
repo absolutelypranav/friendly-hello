@@ -166,7 +166,7 @@ function ScanPage() {
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
         <div className="max-w-2xl print:hidden">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h1 className="text-3xl tracking-tight text-foreground sm:text-5xl">
             Check a package label for Legal Metrology compliance
           </h1>
           <p className="mt-3 text-sm text-muted-foreground sm:text-base">
