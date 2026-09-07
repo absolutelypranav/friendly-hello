@@ -90,7 +90,7 @@ export function ReportView({ report, onDownload }: { report: ComplianceReport; o
         </div>
       </div>
 
-      <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
+      <ul className="divide-y divide-border overflow-hidden rounded-2xl glass">
         {report.results.map((r) => (
           <li key={r.id} className="p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">

@@ -192,7 +192,7 @@ function ScanPage() {
                 if (file) acceptFile(file);
               }}
               className={`rounded-lg border-2 border-dashed p-5 text-center transition-colors ${
-                dragging ? "border-primary bg-accent" : "border-border bg-card"
+                dragging ? "border-primary bg-accent" : "border-border bg-card/40 backdrop-blur"
               }`}
             >
               {imageUrl ? (
@@ -235,7 +235,7 @@ function ScanPage() {
             </div>
 
             {busy ? (
-              <div className="rounded-lg border border-border bg-card p-4">
+              <div className="glass rounded-2xl p-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-card-foreground">
                   <Loader2 className="size-4 animate-spin" />
                   {phase === "preparing" ? "Preparing image…" : `Reading label — ${stage}`}
@@ -247,7 +247,7 @@ function ScanPage() {
               </div>
             ) : null}
 
-            <div className="rounded-lg border border-border bg-card p-4">
+            <div className="glass rounded-2xl p-4">
               <h2 className="text-sm font-semibold text-card-foreground">Extracted text</h2>
               <p className="mt-1 text-xs text-muted-foreground">
                 Correct any uncertain line and re-check — the compliance rules run on this text.
@@ -271,7 +271,7 @@ function ScanPage() {
               </Button>
             </div>
 
-            <div className="rounded-lg border border-border bg-card p-4">
+            <div className="glass rounded-2xl p-4">
               <h2 className="text-sm font-semibold text-card-foreground">Sample labels</h2>
               <p className="mt-1 text-xs text-muted-foreground">Try the checker without a camera.</p>
               <div className="mt-3 flex flex-col gap-2">
@@ -308,7 +308,7 @@ function ScanPage() {
                 }}
               />
             ) : (
-              <div className="flex h-full min-h-64 flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card/50 p-8 text-center print:hidden">
+              <div className="flex h-full min-h-64 flex-col items-center justify-center glass rounded-2xl border-dashed p-8 text-center print:hidden">
                 <ScanLine className="size-10 text-muted-foreground" />
                 <p className="mt-3 text-sm font-medium text-card-foreground">No report yet</p>
                 <p className="mt-1 max-w-sm text-xs text-muted-foreground">

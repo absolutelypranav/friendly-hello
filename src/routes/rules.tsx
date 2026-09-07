@@ -38,7 +38,7 @@ function RulesPage() {
 
         <ol className="mt-8 space-y-3">
           {RULE_CATALOGUE.map((rule, i) => (
-            <li key={rule.id} className="rounded-lg border border-border bg-card p-4">
+            <li key={rule.id} className="glass rounded-2xl p-4">
               <div className="flex items-baseline gap-3">
                 <span className="font-mono text-xs text-muted-foreground tabular-nums">
                   {String(i + 1).padStart(2, "0")}
