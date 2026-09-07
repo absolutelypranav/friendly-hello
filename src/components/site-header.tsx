@@ -3,14 +3,14 @@ import { ScanLine } from "lucide-react";
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-border bg-card/60 backdrop-blur print:hidden">
+    <header className="sticky top-0 z-40 glass border-x-0 border-t-0 rounded-none print:hidden">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <Link to="/" className="flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg">
             <ScanLine className="size-5" />
           </span>
           <span className="leading-tight">
-            <span className="block text-sm font-semibold tracking-tight">Project Metro Scan</span>
+            <span className="block font-display text-base tracking-tight">Project Metro Scan</span>
             <span className="block text-[11px] uppercase tracking-widest text-muted-foreground">
               OUR HACKATHON PROJECT (PROTOTYPE)
             </span>
