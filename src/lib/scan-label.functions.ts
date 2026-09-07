@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { Output, streamText } from "ai";
 import { z } from "zod";
 
-import { createLovableAiProvider } from "./ai-gateway.server";
+import { resolveVisionModel } from "./ai-gateway.server";
 
 const ScanInput = z.object({
   imageDataUrl: z
@@ -51,15 +51,14 @@ function errorDetails(error: unknown): { status?: number; message: string } {
 export const scanLabelWithVision = createServerFn({ method: "POST" })
   .validator((input: unknown) => ScanInput.parse(input))
   .handler(async ({ data }) => {
-    const apiKey = process.env['LOVABLE_API_KEY'];
-    if (!apiKey) {
-      return { ok: false as const, message: "AI scanning is not configured for this project." };
+    const resolved = resolveVisionModel();
+    if (!resolved.ok) {
+      return { ok: false as const, message: resolved.message };
     }
 
     try {
-      const gateway = createLovableAiProvider(apiKey);
       const result = streamText({
-        model: gateway("google/gemini-3.1-pro-preview"),
+        model: resolved.model,
         maxRetries: 2,
         output: Output.object({
           name: "package_label_reading",
@@ -91,7 +90,7 @@ export const scanLabelWithVision = createServerFn({ method: "POST" })
       return { ok: true as const, ...output };
     } catch (error) {
       const { status, message } = errorDetails(error);
-      if (status === 401) return { ok: false as const, message: "AI scanning is not configured correctly." };
+      if (status === 401) return { ok: false as const, message: "The AI key on this deployment was rejected. Check the OPENAI_API_KEY value in your hosting settings." };
       if (status === 402 || status === 403 || status === 400 || status === 429 || (status && status >= 500)) {
         return { ok: false as const, message };
       }
