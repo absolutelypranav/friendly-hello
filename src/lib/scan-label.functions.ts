@@ -90,7 +90,7 @@ export const scanLabelWithVision = createServerFn({ method: "POST" })
       return { ok: true as const, ...output };
     } catch (error) {
       const { status, message } = errorDetails(error);
-      if (status === 401) return { ok: false as const, message: "AI scanning is not configured correctly." };
+      if (status === 401) return { ok: false as const, message: "The AI key on this deployment was rejected. Check the OPENAI_API_KEY value in your hosting settings." };
       if (status === 402 || status === 403 || status === 400 || status === 429 || (status && status >= 500)) {
         return { ok: false as const, message };
       }
