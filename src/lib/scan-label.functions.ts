@@ -51,15 +51,14 @@ function errorDetails(error: unknown): { status?: number; message: string } {
 export const scanLabelWithVision = createServerFn({ method: "POST" })
   .validator((input: unknown) => ScanInput.parse(input))
   .handler(async ({ data }) => {
-    const apiKey = process.env['LOVABLE_API_KEY'];
-    if (!apiKey) {
-      return { ok: false as const, message: "AI scanning is not configured for this project." };
+    const resolved = resolveVisionModel();
+    if (!resolved.ok) {
+      return { ok: false as const, message: resolved.message };
     }
 
     try {
-      const gateway = createLovableAiProvider(apiKey);
       const result = streamText({
-        model: gateway("google/gemini-3.1-pro-preview"),
+        model: resolved.model,
         maxRetries: 2,
         output: Output.object({
           name: "package_label_reading",
